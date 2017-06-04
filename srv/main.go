@@ -5,6 +5,7 @@ import (
 
 	proto "./proto/auth"
 	"github.com/dgrijalva/jwt-go"
+	consulapi "github.com/hashicorp/consul/api"
 	micro "github.com/micro/go-micro"
 	"golang.org/x/net/context"
 )
@@ -20,7 +21,20 @@ func (auth *Auth) Jwt(ctx context.Context, req *proto.JwtRequest, rsp *proto.Jwt
 		"password": req.GetPassword(),
 	})
 
-	secret := []byte("secret")
+	config := consulapi.DefaultConfig()
+	consul, err := consulapi.NewClient(config)
+	if err != nil {
+		return err
+	}
+
+	kv := consul.KV()
+	kvp, _, err := kv.Get("jwtSignKey", nil)
+
+	if err != nil {
+		return err
+	}
+
+	secret := kvp.Value
 	tokenString, err := token.SignedString(secret)
 
 	if err == nil {
