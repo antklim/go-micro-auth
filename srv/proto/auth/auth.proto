@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package go.micro.srv.auth;
+
+service Auth {
+  rpc Jwt(JwtRequest) returns (JwtResponse) {}
+}
+
+message JwtRequest {
+  string username = 1;
+  string password = 2;
+}
+
+message JwtResponse {
+  string token = 3;
+}
