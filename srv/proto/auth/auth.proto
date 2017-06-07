@@ -3,14 +3,24 @@ syntax = "proto3";
 package go.micro.srv.auth;
 
 service Auth {
-  rpc Jwt(JwtRequest) returns (JwtResponse) {}
+  rpc CreateJwt(CreateJwtRequest) returns (CreateJwtResponse) {}
+  rpc ValidateJwt(ValidateJwtRequest) returns (ValidateJwtResponse) {}
 }
 
-message JwtRequest {
-  string username = 1;
-  string password = 2;
+message CreateJwtRequest {
+  string username = 100;
+  string password = 101;
 }
 
-message JwtResponse {
-  string token = 3;
+message CreateJwtResponse {
+  string token = 102;
+}
+
+message ValidateJwtRequest {
+  string token = 200;
+}
+
+message ValidateJwtResponse {
+  bool valid = 201;
+  string error = 202;
 }

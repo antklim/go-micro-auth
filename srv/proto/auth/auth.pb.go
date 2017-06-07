@@ -8,8 +8,10 @@ It is generated from these files:
 	auth.proto
 
 It has these top-level messages:
-	JwtRequest
-	JwtResponse
+	CreateJwtRequest
+	CreateJwtResponse
+	ValidateJwtRequest
+	ValidateJwtResponse
 */
 package go_micro_srv_auth
 
@@ -34,49 +36,91 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.ProtoPackageIsVersion2 // please upgrade the proto package
 
-type JwtRequest struct {
-	Username string `protobuf:"bytes,1,opt,name=username" json:"username,omitempty"`
-	Password string `protobuf:"bytes,2,opt,name=password" json:"password,omitempty"`
+type CreateJwtRequest struct {
+	Username string `protobuf:"bytes,100,opt,name=username" json:"username,omitempty"`
+	Password string `protobuf:"bytes,101,opt,name=password" json:"password,omitempty"`
 }
 
-func (m *JwtRequest) Reset()                    { *m = JwtRequest{} }
-func (m *JwtRequest) String() string            { return proto.CompactTextString(m) }
-func (*JwtRequest) ProtoMessage()               {}
-func (*JwtRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{0} }
+func (m *CreateJwtRequest) Reset()                    { *m = CreateJwtRequest{} }
+func (m *CreateJwtRequest) String() string            { return proto.CompactTextString(m) }
+func (*CreateJwtRequest) ProtoMessage()               {}
+func (*CreateJwtRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{0} }
 
-func (m *JwtRequest) GetUsername() string {
+func (m *CreateJwtRequest) GetUsername() string {
 	if m != nil {
 		return m.Username
 	}
 	return ""
 }
 
-func (m *JwtRequest) GetPassword() string {
+func (m *CreateJwtRequest) GetPassword() string {
 	if m != nil {
 		return m.Password
 	}
 	return ""
 }
 
-type JwtResponse struct {
-	Token string `protobuf:"bytes,3,opt,name=token" json:"token,omitempty"`
+type CreateJwtResponse struct {
+	Token string `protobuf:"bytes,102,opt,name=token" json:"token,omitempty"`
 }
 
-func (m *JwtResponse) Reset()                    { *m = JwtResponse{} }
-func (m *JwtResponse) String() string            { return proto.CompactTextString(m) }
-func (*JwtResponse) ProtoMessage()               {}
-func (*JwtResponse) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{1} }
+func (m *CreateJwtResponse) Reset()                    { *m = CreateJwtResponse{} }
+func (m *CreateJwtResponse) String() string            { return proto.CompactTextString(m) }
+func (*CreateJwtResponse) ProtoMessage()               {}
+func (*CreateJwtResponse) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{1} }
 
-func (m *JwtResponse) GetToken() string {
+func (m *CreateJwtResponse) GetToken() string {
 	if m != nil {
 		return m.Token
 	}
 	return ""
 }
 
+type ValidateJwtRequest struct {
+	Token string `protobuf:"bytes,200,opt,name=token" json:"token,omitempty"`
+}
+
+func (m *ValidateJwtRequest) Reset()                    { *m = ValidateJwtRequest{} }
+func (m *ValidateJwtRequest) String() string            { return proto.CompactTextString(m) }
+func (*ValidateJwtRequest) ProtoMessage()               {}
+func (*ValidateJwtRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{2} }
+
+func (m *ValidateJwtRequest) GetToken() string {
+	if m != nil {
+		return m.Token
+	}
+	return ""
+}
+
+type ValidateJwtResponse struct {
+	Valid bool   `protobuf:"varint,201,opt,name=valid" json:"valid,omitempty"`
+	Error string `protobuf:"bytes,202,opt,name=error" json:"error,omitempty"`
+}
+
+func (m *ValidateJwtResponse) Reset()                    { *m = ValidateJwtResponse{} }
+func (m *ValidateJwtResponse) String() string            { return proto.CompactTextString(m) }
+func (*ValidateJwtResponse) ProtoMessage()               {}
+func (*ValidateJwtResponse) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{3} }
+
+func (m *ValidateJwtResponse) GetValid() bool {
+	if m != nil {
+		return m.Valid
+	}
+	return false
+}
+
+func (m *ValidateJwtResponse) GetError() string {
+	if m != nil {
+		return m.Error
+	}
+	return ""
+}
+
 func init() {
-	proto.RegisterType((*JwtRequest)(nil), "go.micro.srv.auth.JwtRequest")
-	proto.RegisterType((*JwtResponse)(nil), "go.micro.srv.auth.JwtResponse")
+	proto.RegisterType((*CreateJwtRequest)(nil), "go.micro.srv.auth.CreateJwtRequest")
+	proto.RegisterType((*CreateJwtResponse)(nil), "go.micro.srv.auth.CreateJwtResponse")
+	proto.RegisterType((*ValidateJwtRequest)(nil), "go.micro.srv.auth.ValidateJwtRequest")
+	proto.RegisterType((*ValidateJwtResponse)(nil), "go.micro.srv.auth.ValidateJwtResponse")
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -87,7 +131,8 @@ var _ server.Option
 // Client API for Auth service
 
 type AuthClient interface {
-	Jwt(ctx context.Context, in *JwtRequest, opts ...client.CallOption) (*JwtResponse, error)
+	CreateJwt(ctx context.Context, in *CreateJwtRequest, opts ...client.CallOption) (*CreateJwtResponse, error)
+	ValidateJwt(ctx context.Context, in *ValidateJwtRequest, opts ...client.CallOption) (*ValidateJwtResponse, error)
 }
 
 type authClient struct {
@@ -108,9 +153,19 @@ func NewAuthClient(serviceName string, c client.Client) AuthClient {
 	}
 }
 
-func (c *authClient) Jwt(ctx context.Context, in *JwtRequest, opts ...client.CallOption) (*JwtResponse, error) {
-	req := c.c.NewRequest(c.serviceName, "Auth.Jwt", in)
-	out := new(JwtResponse)
+func (c *authClient) CreateJwt(ctx context.Context, in *CreateJwtRequest, opts ...client.CallOption) (*CreateJwtResponse, error) {
+	req := c.c.NewRequest(c.serviceName, "Auth.CreateJwt", in)
+	out := new(CreateJwtResponse)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *authClient) ValidateJwt(ctx context.Context, in *ValidateJwtRequest, opts ...client.CallOption) (*ValidateJwtResponse, error) {
+	req := c.c.NewRequest(c.serviceName, "Auth.ValidateJwt", in)
+	out := new(ValidateJwtResponse)
 	err := c.c.Call(ctx, req, out, opts...)
 	if err != nil {
 		return nil, err
@@ -121,7 +176,8 @@ func (c *authClient) Jwt(ctx context.Context, in *JwtRequest, opts ...client.Cal
 // Server API for Auth service
 
 type AuthHandler interface {
-	Jwt(context.Context, *JwtRequest, *JwtResponse) error
+	CreateJwt(context.Context, *CreateJwtRequest, *CreateJwtResponse) error
+	ValidateJwt(context.Context, *ValidateJwtRequest, *ValidateJwtResponse) error
 }
 
 func RegisterAuthHandler(s server.Server, hdlr AuthHandler, opts ...server.HandlerOption) {
@@ -132,23 +188,32 @@ type Auth struct {
 	AuthHandler
 }
 
-func (h *Auth) Jwt(ctx context.Context, in *JwtRequest, out *JwtResponse) error {
-	return h.AuthHandler.Jwt(ctx, in, out)
+func (h *Auth) CreateJwt(ctx context.Context, in *CreateJwtRequest, out *CreateJwtResponse) error {
+	return h.AuthHandler.CreateJwt(ctx, in, out)
+}
+
+func (h *Auth) ValidateJwt(ctx context.Context, in *ValidateJwtRequest, out *ValidateJwtResponse) error {
+	return h.AuthHandler.ValidateJwt(ctx, in, out)
 }
 
 func init() { proto.RegisterFile("auth.proto", fileDescriptor0) }
 
 var fileDescriptor0 = []byte{
-	// 167 bytes of a gzipped FileDescriptorProto
+	// 246 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe2, 0xe2, 0x4a, 0x2c, 0x2d, 0xc9,
 	0xd0, 0x2b, 0x28, 0xca, 0x2f, 0xc9, 0x17, 0x12, 0x4c, 0xcf, 0xd7, 0xcb, 0xcd, 0x4c, 0x2e, 0xca,
-	0xd7, 0x2b, 0x2e, 0x2a, 0xd3, 0x03, 0x49, 0x28, 0xb9, 0x70, 0x71, 0x79, 0x95, 0x97, 0x04, 0xa5,
-	0x16, 0x96, 0xa6, 0x16, 0x97, 0x08, 0x49, 0x71, 0x71, 0x94, 0x16, 0xa7, 0x16, 0xe5, 0x25, 0xe6,
-	0xa6, 0x4a, 0x30, 0x2a, 0x30, 0x6a, 0x70, 0x06, 0xc1, 0xf9, 0x20, 0xb9, 0x82, 0xc4, 0xe2, 0xe2,
-	0xf2, 0xfc, 0xa2, 0x14, 0x09, 0x26, 0x88, 0x1c, 0x8c, 0xaf, 0xa4, 0xcc, 0xc5, 0x0d, 0x36, 0xa5,
-	0xb8, 0x20, 0x3f, 0xaf, 0x38, 0x55, 0x48, 0x84, 0x8b, 0xb5, 0x24, 0x3f, 0x3b, 0x35, 0x4f, 0x82,
-	0x19, 0xac, 0x0e, 0xc2, 0x31, 0xf2, 0xe3, 0x62, 0x71, 0x2c, 0x2d, 0xc9, 0x10, 0x72, 0xe3, 0x62,
-	0xf6, 0x2a, 0x2f, 0x11, 0x92, 0xd5, 0xc3, 0x70, 0x8d, 0x1e, 0xc2, 0x29, 0x52, 0x72, 0xb8, 0xa4,
-	0x21, 0x76, 0x28, 0x31, 0x24, 0xb1, 0x81, 0x3d, 0x65, 0x0c, 0x08, 0x00, 0x00, 0xff, 0xff, 0xa6,
-	0xe7, 0x45, 0x4a, 0xe2, 0x00, 0x00, 0x00,
+	0xd7, 0x2b, 0x2e, 0x2a, 0xd3, 0x03, 0x49, 0x28, 0x79, 0x71, 0x09, 0x38, 0x17, 0xa5, 0x26, 0x96,
+	0xa4, 0x7a, 0x95, 0x97, 0x04, 0xa5, 0x16, 0x96, 0xa6, 0x16, 0x97, 0x08, 0x49, 0x71, 0x71, 0x94,
+	0x16, 0xa7, 0x16, 0xe5, 0x25, 0xe6, 0xa6, 0x4a, 0xa4, 0x28, 0x30, 0x6a, 0x70, 0x06, 0xc1, 0xf9,
+	0x20, 0xb9, 0x82, 0xc4, 0xe2, 0xe2, 0xf2, 0xfc, 0xa2, 0x14, 0x89, 0x54, 0x88, 0x1c, 0x8c, 0xaf,
+	0xa4, 0xc9, 0x25, 0x88, 0x64, 0x56, 0x71, 0x41, 0x7e, 0x5e, 0x71, 0xaa, 0x90, 0x08, 0x17, 0x6b,
+	0x49, 0x7e, 0x76, 0x6a, 0x9e, 0x44, 0x1a, 0x58, 0x35, 0x84, 0xa3, 0xa4, 0xcd, 0x25, 0x14, 0x96,
+	0x98, 0x93, 0x99, 0x82, 0x6a, 0xb1, 0x28, 0x4c, 0xed, 0x09, 0x46, 0x64, 0xc5, 0xce, 0x5c, 0xc2,
+	0x28, 0x8a, 0xa1, 0x26, 0x8b, 0x72, 0xb1, 0x96, 0x81, 0x84, 0x25, 0x4e, 0x82, 0x54, 0x73, 0x04,
+	0x41, 0x78, 0x20, 0xe1, 0xd4, 0xa2, 0xa2, 0xfc, 0x22, 0x89, 0x53, 0x50, 0x43, 0xc0, 0x3c, 0xa3,
+	0x03, 0x8c, 0x5c, 0x2c, 0x8e, 0xa5, 0x25, 0x19, 0x42, 0x11, 0x5c, 0x9c, 0x70, 0x57, 0x0a, 0x29,
+	0xeb, 0x61, 0x04, 0x89, 0x1e, 0x7a, 0x78, 0x48, 0xa9, 0xe0, 0x57, 0x04, 0x71, 0x8e, 0x12, 0x83,
+	0x50, 0x1c, 0x17, 0x37, 0x92, 0x3b, 0x85, 0x54, 0xb1, 0x68, 0xc3, 0xf4, 0xb4, 0x94, 0x1a, 0x21,
+	0x65, 0x30, 0xf3, 0x93, 0xd8, 0xc0, 0xb1, 0x68, 0x0c, 0x08, 0x00, 0x00, 0xff, 0xff, 0xc2, 0x98,
+	0xb1, 0xed, 0xd3, 0x01, 0x00, 0x00,
 }

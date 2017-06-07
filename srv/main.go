@@ -20,8 +20,8 @@ func getKVPair(kv *consulapi.KV, key string) ([]byte, error) {
 // Auth structure, contains different authentification methods
 type Auth struct{}
 
-// Jwt method implementation
-func (auth *Auth) Jwt(ctx context.Context, req *proto.JwtRequest, rsp *proto.JwtResponse) error {
+// CreateJwt method implementation
+func (auth *Auth) CreateJwt(ctx context.Context, req *proto.CreateJwtRequest, rsp *proto.CreateJwtResponse) error {
 	// TODO: move consul client initiation out of the scope of the method
 	consulConfig := consulapi.DefaultConfig()
 	consul, err := consulapi.NewClient(consulConfig)
@@ -55,11 +55,18 @@ func (auth *Auth) Jwt(ctx context.Context, req *proto.JwtRequest, rsp *proto.Jwt
 	})
 	tokenString, err := token.SignedString(secret)
 
-	if err == nil {
-		rsp.Token = tokenString
+	if err != nil {
+		return err
 	}
 
-	return err
+	rsp.Token = tokenString
+
+	return nil
+}
+
+// ValidateJwt method implementation
+func (auth *Auth) ValidateJwt(ctx context.Context, req *proto.ValidateJwtRequest, rsp *proto.ValidateJwtResponse) error {
+	return nil
 }
 
 func main() {

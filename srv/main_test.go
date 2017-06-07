@@ -11,12 +11,12 @@ import "golang.org/x/net/context"
 func TestJwtGeneration(t *testing.T) {
 	for _, test := range testCases {
 		auth := new(Auth)
-		req := proto.JwtRequest{
+		req := proto.CreateJwtRequest{
 			Username: test.username,
 			Password: test.password,
 		}
-		rsp := proto.JwtResponse{}
-		err := auth.Jwt(context.TODO(), &req, &rsp)
+		rsp := proto.CreateJwtResponse{}
+		err := auth.CreateJwt(context.TODO(), &req, &rsp)
 
 		if err != nil {
 			t.Fatalf("Error happened")
