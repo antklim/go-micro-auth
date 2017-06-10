@@ -1,4 +1,4 @@
-package main
+package auth
 
 var testCases = []struct {
 	username    string
