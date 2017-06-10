@@ -8,6 +8,6 @@ type Config struct {
 	ConfigHandler
 }
 
-func Init(hdlr ConfigHandler) *Config {
+func InitConfig(hdlr ConfigHandler) *Config {
 	return &Config{hdlr}
 }

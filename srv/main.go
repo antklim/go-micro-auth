@@ -7,15 +7,9 @@ import (
 
 	proto "./proto/auth"
 	"github.com/dgrijalva/jwt-go"
-	consulapi "github.com/hashicorp/consul/api"
 	micro "github.com/micro/go-micro"
 	"golang.org/x/net/context"
 )
-
-func getKVPair(kv *consulapi.KV, key string) ([]byte, error) {
-	kvp, _, err := kv.Get(key, nil)
-	return kvp.Value, err
-}
 
 // func createJwt()
 
@@ -23,6 +17,8 @@ func getKVPair(kv *consulapi.KV, key string) ([]byte, error) {
 type Auth struct {
 	jwssecret []byte
 	jwtttl    int32
+	// TODO: replace jwssecret and jwtttl with config interface
+	// config ConfigHandler
 }
 
 // CreateJwt method implementation
@@ -56,24 +52,21 @@ func main() {
 		micro.Version("latest"),
 	)
 
-	// TODO: Move the following code to config initialisation part
-	consulConfig := consulapi.DefaultConfig()
-	consul, err := consulapi.NewClient(consulConfig)
+	// TODO: config should be switchable based on environment variables or CLI options
+	config := InitConsulConfig("auth/config/")
+	if config.err != nil {
+		log.Fatal(config.err)
+		return
+	}
+
+	// TODO: Move the KeyValue pair getters into CreateJwt method
+	secret, err := config.GetKVPair("jwssecret")
 	if err != nil {
 		log.Fatal(err)
 		return
 	}
 
-	kv := consul.KV()
-
-	// TODO: Move the KeyValue pair getter into config interface
-	secret, err := getKVPair(kv, "auth/config/jwssecret")
-	if err != nil {
-		log.Fatal(err)
-		return
-	}
-
-	ttl, err := getKVPair(kv, "auth/config/jwtttl")
+	ttl, err := config.GetKVPair("jwtttl")
 	if err != nil {
 		log.Fatal(err)
 		return
@@ -85,7 +78,6 @@ func main() {
 		return
 	}
 
-	////////////////////////
 	proto.RegisterAuthHandler(service.Server(), &Auth{jwssecret: secret, jwtttl: int32(exp64)})
 
 	service.Init()
