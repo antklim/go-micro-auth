@@ -1,7 +1,7 @@
 package auth
 
 type ConfigHandler interface {
-	GetKVPair(key string)
+	GetKVPair(key string) ([]byte, error)
 }
 
 type Config struct {
@@ -10,4 +10,8 @@ type Config struct {
 
 func InitConfig(hdlr ConfigHandler) *Config {
 	return &Config{hdlr}
+}
+
+func (c *Config) GetKVPair(key string) ([]byte, error) {
+	return c.ConfigHandler.GetKVPair(key)
 }
