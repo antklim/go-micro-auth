@@ -2,11 +2,11 @@
 Authentication microservice in Go lang
 
 # Service configuration
-Authentication microservice is using `Consul` as a service discovery. Consul is also a default configuration source.
+Authentication microservice is using `Consul` as a service discovery. `Consul` is also a default configuration source.
 
 Command line options to define configuration:
--config consul|file
--configPath path/to/config.json (used only in case of file config)
+- -config [consul|file]
+- -configPath path/to/config.json (used only in case of file config)
 
 ## Configuration on Consul
 There are the following keys used:
