@@ -9,9 +9,6 @@ import (
 
 import "golang.org/x/net/context"
 
-// TODO: stub time library
-// due to iat and exp field addition token will depend on current timestamp
-
 // Config mock
 type testConfig struct{}
 
@@ -28,7 +25,7 @@ func (c *testConfig) GetKVPair(key string) ([]byte, error) {
 	}
 }
 
-func TestJwtGeneration(t *testing.T) {
+func TestCreateJwt(t *testing.T) {
 	for _, test := range testCases {
 		auth := &Auth{new(testConfig)}
 		req := proto.CreateJwtRequest{
@@ -41,6 +38,11 @@ func TestJwtGeneration(t *testing.T) {
 		if err != nil {
 			t.Fatalf("Error happened")
 		}
+
+		// TODO: split token, decode Base64 encoding, validate header and claims
+		//       header should have 'typ', 'alg'
+		//       claim should have 'iat', 'exp', 'username', 'password'
+		//         iat should NOT be after current timestamp
 
 		if rsp.GetToken() != test.expected {
 			// t.Fatalf("Jwt(ctx, req, rsp) = %s, want %s (%s)",
