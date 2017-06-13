@@ -1,4 +1,4 @@
-package auth
+package config
 
 type ConfigHandler interface {
 	GetKVPair(key string) ([]byte, error)

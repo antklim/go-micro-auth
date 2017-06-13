@@ -1,28 +1,28 @@
-package auth
+package consul
 
 import consulapi "github.com/hashicorp/consul/api"
 
-type ConsulConfig struct {
+type Config struct {
 	consul    *consulapi.Client
 	kv        *consulapi.KV
 	keyPrefix string
-	err       error
+	Err       error
 }
 
-func InitConsulConfig(keyPrefix string) *ConsulConfig {
+func InitConfig(keyPrefix string) *Config {
 	consulConfig := consulapi.DefaultConfig()
 	consul, err := consulapi.NewClient(consulConfig)
 
 	if err != nil {
-		return &ConsulConfig{consul, nil, keyPrefix, err}
+		return &Config{consul, nil, keyPrefix, err}
 	}
 
-	return &ConsulConfig{consul, consul.KV(), keyPrefix, err}
+	return &Config{consul, consul.KV(), keyPrefix, err}
 }
 
-func (c *ConsulConfig) GetKVPair(key string) ([]byte, error) {
-	if c.err != nil {
-		return nil, c.err
+func (c *Config) GetKVPair(key string) ([]byte, error) {
+	if c.Err != nil {
+		return nil, c.Err
 	}
 
 	kvp, _, err := c.kv.Get(c.keyPrefix+key, nil)

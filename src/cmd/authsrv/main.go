@@ -1,19 +1,21 @@
-package auth
+package main
 
 import (
 	"log"
 	"strconv"
 	"time"
 
-	proto "./proto/auth"
-	"github.com/dgrijalva/jwt-go"
+	config "../../pkg/config"
+	consulConfig "../../pkg/config/consul"
+	proto "../../pkg/proto/auth"
+	jwt "github.com/dgrijalva/jwt-go"
 	micro "github.com/micro/go-micro"
 	"golang.org/x/net/context"
 )
 
 // Auth structure, contains different authentification methods
 type Auth struct {
-	config ConfigHandler
+	config config.ConfigHandler
 }
 
 // CreateJwt method implementation
@@ -63,13 +65,13 @@ func main() {
 	)
 
 	// TODO: config should be switchable based on environment variables or CLI options
-	config := InitConsulConfig("auth/config/")
-	if config.err != nil {
-		log.Fatal(config.err)
+	serviceConfig := consulConfig.InitConfig("auth/config/")
+	if serviceConfig.Err != nil {
+		log.Fatal(serviceConfig.Err)
 		return
 	}
 
-	proto.RegisterAuthHandler(service.Server(), &Auth{config})
+	proto.RegisterAuthHandler(service.Server(), &Auth{config.InitConfig(serviceConfig)})
 
 	service.Init()
 

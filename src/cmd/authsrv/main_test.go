@@ -1,10 +1,11 @@
-package auth
+package main
 
 import (
 	"errors"
 	"testing"
 
-	proto "./proto/auth"
+	config "../../pkg/config"
+	proto "../../pkg/proto/auth"
 )
 
 import "golang.org/x/net/context"
@@ -12,7 +13,7 @@ import "golang.org/x/net/context"
 // Config mock
 type testConfig struct{}
 
-var _ ConfigHandler = (*testConfig)(nil)
+var _ config.ConfigHandler = (*testConfig)(nil)
 
 func (c *testConfig) GetKVPair(key string) ([]byte, error) {
 	switch key {
