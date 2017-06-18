@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"strconv"
 	"time"
@@ -30,15 +31,15 @@ func (auth *Auth) CreateJwt(ctx context.Context, req *proto.CreateJwtRequest, rs
 		return err
 	}
 
-	exp64, err := strconv.ParseInt(string(ttl), 10, 32)
+	exp, err := strconv.ParseInt(string(ttl), 10, 32)
 	if err != nil {
 		return err
 	}
 
-	iat := int32(time.Now().Unix())
+	iat := time.Now().Unix()
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"iat":      iat,
-		"exp":      iat + int32(exp64),
+		"exp":      iat + exp,
 		"username": req.GetUsername(),
 		"password": req.GetPassword(),
 	})
@@ -55,6 +56,28 @@ func (auth *Auth) CreateJwt(ctx context.Context, req *proto.CreateJwtRequest, rs
 
 // ValidateJwt method implementation
 func (auth *Auth) ValidateJwt(ctx context.Context, req *proto.ValidateJwtRequest, rsp *proto.ValidateJwtResponse) error {
+	tokenString := req.GetToken()
+	_, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
+		}
+
+		claims := token.Claims.(jwt.MapClaims)
+		if claims["iat"] == nil {
+			return nil, fmt.Errorf("Required field 'iat' not found")
+		}
+
+		if claims["exp"] == nil {
+			return nil, fmt.Errorf("Required field 'exp' not found")
+		}
+
+		return nil, nil
+	})
+
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 

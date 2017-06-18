@@ -1,14 +1,18 @@
 package main
 
 import (
+	"encoding/json"
 	"errors"
+	"strings"
 	"testing"
+	"time"
+
+	jwt "github.com/dgrijalva/jwt-go"
 
 	config "../../pkg/config"
 	proto "../../pkg/proto/auth"
+	"golang.org/x/net/context"
 )
-
-import "golang.org/x/net/context"
 
 // Config mock
 type testConfig struct{}
@@ -26,6 +30,13 @@ func (c *testConfig) GetKVPair(key string) ([]byte, error) {
 	}
 }
 
+type testClaims struct {
+	Iat      int64  `json:"iat"`
+	Exp      int64  `json:"exp"`
+	Username string `json:"username"`
+	Password string `json:"password"`
+}
+
 func TestCreateJwt(t *testing.T) {
 	for _, test := range testCases {
 		auth := &Auth{new(testConfig)}
@@ -34,20 +45,46 @@ func TestCreateJwt(t *testing.T) {
 			Password: test.password,
 		}
 		rsp := proto.CreateJwtResponse{}
-		err := auth.CreateJwt(context.TODO(), &req, &rsp)
 
-		if err != nil {
-			t.Fatalf("Error happened")
+		if err := auth.CreateJwt(context.TODO(), &req, &rsp); err != nil {
+			t.Fatalf("Error happened: %v", err)
 		}
 
-		// TODO: split token, decode Base64 encoding, validate header and claims
-		//       header should have 'typ', 'alg'
-		//       claim should have 'iat', 'exp', 'username', 'password'
-		//         iat should NOT be after current timestamp
+		tokenParts := strings.Split(rsp.GetToken(), ".")
 
-		if rsp.GetToken() != test.expected {
-			// t.Fatalf("Jwt(ctx, req, rsp) = %s, want %s (%s)",
-			// 	rsp.GetToken(), test.expected, test.description)
+		if l := len(tokenParts); l != 3 {
+			t.Fatalf("JWS token should contain %d segments, but found %d segments", 3, l)
+		}
+
+		if tokenParts[0] != test.header {
+			t.Fatalf("JWS header expected: %s, but found: %s", test.header, tokenParts[0])
+		}
+
+		claimBytes, err := jwt.DecodeSegment(tokenParts[1])
+
+		if err != nil {
+			t.Fatalf("Error happened: %v", err)
+		}
+
+		claims := testClaims{}
+		if err = json.Unmarshal(claimBytes, &claims); err != nil {
+			t.Fatalf("Error happened: %v", err)
+		}
+
+		if test.username != claims.Username {
+			t.Fatalf("Username expected: %s, but found: %s", test.username, claims.Username)
+		}
+
+		if test.password != claims.Password {
+			t.Fatalf("Password expected: %s, but found: %s", test.password, claims.Password)
+		}
+
+		if claims.Iat > time.Now().Unix() {
+			t.Fatal("'iat' field should be before current time")
+		}
+
+		if claims.Exp != claims.Iat+180000 {
+			t.Fatalf("'exp' field value expected: %d, but found: %d", claims.Iat+180000, claims.Exp)
 		}
 	}
 }
