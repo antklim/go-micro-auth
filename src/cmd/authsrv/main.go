@@ -71,14 +71,11 @@ func (auth *Auth) ValidateJwt(ctx context.Context, req *proto.ValidateJwtRequest
 			return nil, fmt.Errorf("Required field 'exp' not found")
 		}
 
-		return nil, nil
+		secret, err := auth.config.GetKVPair("jwssecret")
+		return secret, err
 	})
 
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return err
 }
 
 func main() {

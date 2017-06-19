@@ -38,7 +38,7 @@ type testClaims struct {
 }
 
 func TestCreateJwt(t *testing.T) {
-	for _, test := range testCases {
+	for _, test := range createJwtTestCases {
 		auth := &Auth{new(testConfig)}
 		req := proto.CreateJwtRequest{
 			Username: test.username,
@@ -85,6 +85,31 @@ func TestCreateJwt(t *testing.T) {
 
 		if claims.Exp != claims.Iat+180000 {
 			t.Fatalf("'exp' field value expected: %d, but found: %d", claims.Iat+180000, claims.Exp)
+		}
+	}
+}
+
+func TestValidateJwt(t *testing.T) {
+	for _, test := range validateJwtTestCases {
+		auth := &Auth{new(testConfig)}
+		req := proto.ValidateJwtRequest{
+			Token: test.token,
+		}
+		rsp := proto.ValidateJwtResponse{}
+		err := auth.ValidateJwt(context.TODO(), &req, &rsp)
+
+		if test.isError == true {
+			if err == nil {
+				t.Fatal("Validation should fail")
+			}
+
+			if test.expected != err.Error() {
+				t.Fatalf("Expected error: %s, but found: %s", test.expected, err.Error())
+			}
+		} else {
+			if err != nil {
+				t.Fatalf("Validation should pass, but found error: %v", err)
+			}
 		}
 	}
 }
