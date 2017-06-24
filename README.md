@@ -6,7 +6,7 @@ Authentication microservice is using `Consul` as a service discovery. `Consul` i
 
 Command line options to define configuration:
 - -config [consul|file]
-- -configPath path/to/config.json (used only in case of file config)
+- -config_path path/to/config.json (used only in case of file config)
 
 ## Configuration on Consul
 There are the following keys used:
