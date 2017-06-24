@@ -6,25 +6,20 @@ type Config struct {
 	consul    *consulapi.Client
 	kv        *consulapi.KV
 	keyPrefix string
-	Err       error
 }
 
-func InitConfig(keyPrefix string) *Config {
+func Init(keyPrefix string) (*Config, error) {
 	consulConfig := consulapi.DefaultConfig()
 	consul, err := consulapi.NewClient(consulConfig)
 
 	if err != nil {
-		return &Config{consul, nil, keyPrefix, err}
+		return nil, err
 	}
 
-	return &Config{consul, consul.KV(), keyPrefix, err}
+	return &Config{consul, consul.KV(), keyPrefix}, nil
 }
 
 func (c *Config) GetKVPair(key string) ([]byte, error) {
-	if c.Err != nil {
-		return nil, c.Err
-	}
-
 	kvp, _, err := c.kv.Get(c.keyPrefix+key, nil)
 	if err != nil {
 		return nil, err

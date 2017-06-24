@@ -12,18 +12,16 @@ import (
 )
 
 // Auth structure, contains different authentification methods
-type Auth struct {
-	config config.ConfigHandler
-}
+type Auth struct{}
 
 // CreateJwt method implementation
 func (auth *Auth) CreateJwt(ctx context.Context, req *proto.CreateJwtRequest, rsp *proto.CreateJwtResponse) error {
-	secret, err := auth.config.GetKVPair("jwssecret")
+	secret, err := config.GetKVPair("jwssecret")
 	if err != nil {
 		return err
 	}
 
-	ttl, err := auth.config.GetKVPair("jwtttl")
+	ttl, err := config.GetKVPair("jwtttl")
 	if err != nil {
 		return err
 	}
@@ -68,7 +66,7 @@ func (auth *Auth) ValidateJwt(ctx context.Context, req *proto.ValidateJwtRequest
 			return nil, fmt.Errorf("Required field 'exp' not found")
 		}
 
-		secret, err := auth.config.GetKVPair("jwssecret")
+		secret, err := config.GetKVPair("jwssecret")
 		return secret, err
 	})
 
