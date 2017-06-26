@@ -1,19 +1,47 @@
 package config
 
-import "testing"
+import (
+	"reflect"
+	"testing"
 
-func TestGet(t *testing.T) {
-	config = nil
-	_, err := Get()
-	if err.Error() != "Config is not inited" {
-		t.Fatalf("Unexpected error: %v", err)
+	"github.com/stretchr/testify/require"
+)
+
+func Test_initConfig(t *testing.T) {
+	for _, test := range initConfigTestCases {
+		actualResult, err := initConfig(test.source)
+
+		if test.err == nil {
+			require.NoError(t, err, "Expected no error")
+			// TODO: validate cofig type (file, consul)
+			require.NotNil(t, actualResult, "Expected config not nil")
+		} else {
+			require.Nil(t, actualResult, "Expected no config inited")
+
+			if !reflect.DeepEqual(test.err, err) {
+				t.Fatalf("Expected %v, but got %v", test.err, err)
+			}
+		}
 	}
 }
 
-func Test_initConfig(t *testing.T) {
-	_, err := initConfig("blah")
-	if err.Error() != "Unsupported config source: 'blah'" {
-		t.Fatalf("Unexpected error: %v", err)
-	}
+func TestGet(t *testing.T) {
+	for _, test := range getTestCases {
+		config = test.config
+		actualResult, err := Get()
 
+		if test.err == nil {
+			require.NoError(t, err, "Expected no error")
+
+			if !reflect.DeepEqual(test.config, actualResult) {
+				t.Fatalf("Expected %v, but got %v", test.config, actualResult)
+			}
+		} else {
+			require.Nil(t, actualResult, "Expected no config returned")
+
+			if !reflect.DeepEqual(test.err, err) {
+				t.Fatalf("Expected %v, but got %v", test.err, err)
+			}
+		}
+	}
 }

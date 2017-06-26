@@ -2,6 +2,8 @@ package consul
 
 import consulapi "github.com/hashicorp/consul/api"
 
+// TODO: Interaction with the consul should be tested in integration tests
+
 type Config struct {
 	consul    *consulapi.Client
 	kv        *consulapi.KV
