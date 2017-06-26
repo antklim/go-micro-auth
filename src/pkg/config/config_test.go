@@ -45,3 +45,24 @@ func TestGet(t *testing.T) {
 		}
 	}
 }
+
+func TestGetKVPair(t *testing.T) {
+	for _, test := range getKVPairTestCases {
+		config = test.config
+		actualResult, err := config.GetKVPair(test.key)
+
+		if test.err == nil {
+			require.NoError(t, err, "Expected no error")
+
+			if !reflect.DeepEqual(test.expected, actualResult) {
+				t.Fatalf("Expected %v, but got %v", test.expected, actualResult)
+			}
+		} else {
+			require.Nil(t, actualResult, "Expected no result returned")
+
+			if !reflect.DeepEqual(test.err, err) {
+				t.Fatalf("Expected %v, but got %v", test.err, err)
+			}
+		}
+	}
+}
