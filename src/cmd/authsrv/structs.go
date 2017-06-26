@@ -80,5 +80,10 @@ func (auth *Auth) ValidateJwt(ctx context.Context, req *proto.ValidateJwtRequest
 		return secret, err
 	})
 
-	return err
+	rsp.Valid = err == nil
+	if err != nil {
+		rsp.Error = err.Error()
+	}
+
+	return nil
 }

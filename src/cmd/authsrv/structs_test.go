@@ -3,11 +3,13 @@ package main
 import (
 	"encoding/json"
 	"errors"
+	"reflect"
 	"strings"
 	"testing"
 	"time"
 
 	jwt "github.com/dgrijalva/jwt-go"
+	"github.com/stretchr/testify/require"
 
 	config "../../pkg/config"
 	proto "../../pkg/proto/auth"
@@ -16,8 +18,6 @@ import (
 
 // Config mock
 type testConfig struct{}
-
-var _ config.ConfigHandler = (*testConfig)(nil)
 
 func (c *testConfig) GetKVPair(key string) ([]byte, error) {
 	switch key {
@@ -30,6 +30,8 @@ func (c *testConfig) GetKVPair(key string) ([]byte, error) {
 	}
 }
 
+var _, _ = config.Set(&config.Config{new(testConfig)})
+
 type testClaims struct {
 	Iat      int64  `json:"iat"`
 	Exp      int64  `json:"exp"`
@@ -40,15 +42,11 @@ type testClaims struct {
 func TestCreateJwt(t *testing.T) {
 	for _, test := range createJwtTestCases {
 		auth := new(Auth)
-		req := proto.CreateJwtRequest{
-			Username: test.username,
-			Password: test.password,
-		}
-		rsp := proto.CreateJwtResponse{}
+		req := test.request
+		rsp := &proto.CreateJwtResponse{}
+		err := auth.CreateJwt(context.TODO(), req, rsp)
 
-		if err := auth.CreateJwt(context.TODO(), &req, &rsp); err != nil {
-			t.Fatalf("Error happened: %v", err)
-		}
+		require.NoError(t, err, "Expected no error")
 
 		tokenParts := strings.Split(rsp.GetToken(), ".")
 
@@ -71,12 +69,12 @@ func TestCreateJwt(t *testing.T) {
 			t.Fatalf("Error happened: %v", err)
 		}
 
-		if test.username != claims.Username {
-			t.Fatalf("Username expected: %s, but found: %s", test.username, claims.Username)
+		if req.GetUsername() != claims.Username {
+			t.Fatalf("Expected username %s, but got %s", req.GetUsername(), claims.Username)
 		}
 
-		if test.password != claims.Password {
-			t.Fatalf("Password expected: %s, but found: %s", test.password, claims.Password)
+		if req.GetPassword() != claims.Password {
+			t.Fatalf("Expected password %s, but got %s", req.GetPassword(), claims.Password)
 		}
 
 		if claims.Iat > time.Now().Unix() {
@@ -92,24 +90,13 @@ func TestCreateJwt(t *testing.T) {
 func TestValidateJwt(t *testing.T) {
 	for _, test := range validateJwtTestCases {
 		auth := new(Auth)
-		req := proto.ValidateJwtRequest{
-			Token: test.token,
-		}
-		rsp := proto.ValidateJwtResponse{}
-		err := auth.ValidateJwt(context.TODO(), &req, &rsp)
+		rsp := &proto.ValidateJwtResponse{}
+		err := auth.ValidateJwt(context.TODO(), test.request, rsp)
 
-		if test.isError == true {
-			if err == nil {
-				t.Fatal("Validation should fail")
-			}
+		require.NoError(t, err, "Expected no error")
 
-			if test.expected != err.Error() {
-				t.Fatalf("Expected error: %s, but found: %s", test.expected, err.Error())
-			}
-		} else {
-			if err != nil {
-				t.Fatalf("Validation should pass, but found error: %v", err)
-			}
+		if !reflect.DeepEqual(test.expectedResponse, rsp) {
+			t.Fatalf("Expected %v, but got %v", test.expectedResponse, rsp)
 		}
 	}
 }

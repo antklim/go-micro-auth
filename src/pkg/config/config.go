@@ -57,6 +57,15 @@ func Get() (*Config, error) {
 	return config, err
 }
 
+func Set(_config *Config) (*Config, error) {
+	var err error
+	if config != nil {
+		err = fmt.Errorf("Config already inited")
+	}
+	config = _config
+	return config, err
+}
+
 func (c *Config) GetKVPair(key string) ([]byte, error) {
 	return c.ConfigHandler.GetKVPair(key)
 }
