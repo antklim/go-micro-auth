@@ -16,12 +16,17 @@ type Auth struct{}
 
 // CreateJwt method implementation
 func (auth *Auth) CreateJwt(ctx context.Context, req *proto.CreateJwtRequest, rsp *proto.CreateJwtResponse) error {
-	secret, err := config.GetKVPair("jwssecret")
+	serviceConfig, err := config.Get()
 	if err != nil {
 		return err
 	}
 
-	ttl, err := config.GetKVPair("jwtttl")
+	secret, err := serviceConfig.GetKVPair("jwssecret")
+	if err != nil {
+		return err
+	}
+
+	ttl, err := serviceConfig.GetKVPair("jwtttl")
 	if err != nil {
 		return err
 	}
@@ -66,7 +71,12 @@ func (auth *Auth) ValidateJwt(ctx context.Context, req *proto.ValidateJwtRequest
 			return nil, fmt.Errorf("Required field 'exp' not found")
 		}
 
-		secret, err := config.GetKVPair("jwssecret")
+		serviceConfig, err := config.Get()
+		if err != nil {
+			return nil, err
+		}
+
+		secret, err := serviceConfig.GetKVPair("jwssecret")
 		return secret, err
 	})
 

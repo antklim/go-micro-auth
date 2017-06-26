@@ -22,15 +22,15 @@ type Config struct {
 
 func Init() error {
 	var err error
-	config, err = initConfig()
+	config, err = initConfig(Source)
 	return err
 }
 
-func initConfig() (*Config, error) {
+func initConfig(source string) (*Config, error) {
 	var configHandler ConfigHandler
 	var err error
 
-	switch Source {
+	switch source {
 	case "consul":
 		configHandler, err = consulConfig.Init("auth/config/")
 		break
@@ -38,7 +38,7 @@ func initConfig() (*Config, error) {
 		configHandler, err = fileConfig.Init(FilePath)
 		break
 	default:
-		err = fmt.Errorf("Unsupported config source: '%s'", Source)
+		err = fmt.Errorf("Unsupported config source: '%s'", source)
 		break
 	}
 

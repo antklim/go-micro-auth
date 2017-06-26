@@ -39,7 +39,7 @@ type testClaims struct {
 
 func TestCreateJwt(t *testing.T) {
 	for _, test := range createJwtTestCases {
-		auth := &Auth{new(testConfig)}
+		auth := new(Auth)
 		req := proto.CreateJwtRequest{
 			Username: test.username,
 			Password: test.password,
@@ -91,7 +91,7 @@ func TestCreateJwt(t *testing.T) {
 
 func TestValidateJwt(t *testing.T) {
 	for _, test := range validateJwtTestCases {
-		auth := &Auth{new(testConfig)}
+		auth := new(Auth)
 		req := proto.ValidateJwtRequest{
 			Token: test.token,
 		}
