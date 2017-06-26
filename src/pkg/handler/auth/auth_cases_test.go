@@ -1,7 +1,7 @@
-package main
+package auth
 
 import "fmt"
-import proto "../../pkg/proto/auth"
+import proto "../../../pkg/proto/auth"
 
 func getCreateJwtRequest(username, password string) *proto.CreateJwtRequest {
 	return &proto.CreateJwtRequest{

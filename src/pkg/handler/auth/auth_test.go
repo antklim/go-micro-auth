@@ -1,4 +1,4 @@
-package main
+package auth
 
 import (
 	"encoding/json"
@@ -11,8 +11,8 @@ import (
 	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/stretchr/testify/require"
 
-	config "../../pkg/config"
-	proto "../../pkg/proto/auth"
+	config "../../../pkg/config"
+	proto "../../../pkg/proto/auth"
 	"golang.org/x/net/context"
 )
 

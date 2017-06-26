@@ -1,12 +1,12 @@
-package main
+package auth
 
 import (
 	"fmt"
 	"strconv"
 	"time"
 
-	config "../../pkg/config"
-	proto "../../pkg/proto/auth"
+	config "../../../pkg/config"
+	proto "../../../pkg/proto/auth"
 	jwt "github.com/dgrijalva/jwt-go"
 	"golang.org/x/net/context"
 )

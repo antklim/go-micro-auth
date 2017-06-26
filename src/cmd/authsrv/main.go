@@ -4,6 +4,7 @@ import (
 	"log"
 
 	config "../../pkg/config"
+	handler "../../pkg/handler/auth"
 	proto "../../pkg/proto/auth"
 	"github.com/micro/cli"
 	micro "github.com/micro/go-micro"
@@ -35,7 +36,7 @@ func main() {
 
 	service.Init()
 
-	proto.RegisterAuthHandler(service.Server(), new(Auth))
+	proto.RegisterAuthHandler(service.Server(), new(handler.Auth))
 
 	if err := config.Init(); err != nil {
 		log.Fatal(err)
