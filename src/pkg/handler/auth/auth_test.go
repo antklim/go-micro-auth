@@ -19,7 +19,7 @@ import (
 // Config mock
 type testConfig struct{}
 
-func (c *testConfig) GetKVPair(key string) ([]byte, error) {
+func (c testConfig) GetKVPair(key string) ([]byte, error) {
 	switch key {
 	case "jwssecret":
 		return []byte("secret"), nil

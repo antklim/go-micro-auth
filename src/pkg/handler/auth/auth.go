@@ -15,7 +15,7 @@ import (
 type Auth struct{}
 
 // CreateJwt method implementation
-func (auth *Auth) CreateJwt(ctx context.Context, req *proto.CreateJwtRequest, rsp *proto.CreateJwtResponse) error {
+func (auth Auth) CreateJwt(ctx context.Context, req *proto.CreateJwtRequest, rsp *proto.CreateJwtResponse) error {
 	serviceConfig, err := config.Get()
 	if err != nil {
 		return err
@@ -55,7 +55,7 @@ func (auth *Auth) CreateJwt(ctx context.Context, req *proto.CreateJwtRequest, rs
 }
 
 // ValidateJwt method implementation
-func (auth *Auth) ValidateJwt(ctx context.Context, req *proto.ValidateJwtRequest, rsp *proto.ValidateJwtResponse) error {
+func (auth Auth) ValidateJwt(ctx context.Context, req *proto.ValidateJwtRequest, rsp *proto.ValidateJwtResponse) error {
 	tokenString := req.GetToken()
 	_, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
