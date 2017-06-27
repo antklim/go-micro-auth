@@ -5,8 +5,8 @@ Authentication microservice in Go lang
 Authentication microservice is using `Consul` as a service discovery. `Consul` is also a default configuration source.
 
 Command line options to define configuration:
-- -config [consul|file]
-- -config_path path/to/config.json (used only in case of file config)
+- `-config [consul|file]` or `-config=[consul|file]`
+- `-config_path path/to/service.cfg` or `-config_path=path/to/service.cfg` (used only in case of file config)
 
 ## Configuration on Consul
 There are the following keys used:
@@ -17,3 +17,5 @@ There are the following keys used:
 There are the following keys used:
 - jwssecret - signing key value for JWT(JWS) signing
 - jwtttl - default TTL of the token
+
+Please check `service.cfg` for config file example
