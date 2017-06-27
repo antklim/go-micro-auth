@@ -11,8 +11,11 @@ import (
 )
 
 var (
+	// Version of the service
 	Version string
-	Build   string
+
+	// Build number of the service
+	Build string
 )
 
 func initServiceConfig(c *cli.Context) {
@@ -44,11 +47,14 @@ func main() {
 
 	service.Init()
 
-	proto.RegisterAuthHandler(service.Server(), new(handler.Auth))
-
-	if err := config.Init(); err != nil {
+	// `config` Init() should be called after service init
+	// All `config` variables are set on service init action
+	configHandler, err := config.Init()
+	if err != nil {
 		log.Fatal(err)
 	}
+
+	proto.RegisterAuthHandler(service.Server(), &handler.Auth{ConfigHandler: configHandler})
 
 	if err := service.Run(); err != nil {
 		log.Fatal(err)

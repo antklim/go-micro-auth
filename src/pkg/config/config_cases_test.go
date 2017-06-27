@@ -2,7 +2,7 @@ package config
 
 import "fmt"
 
-var initConfigTestCases = []struct {
+var initTestCases = []struct {
 	source       string
 	configInited bool
 	err          error
@@ -10,14 +10,6 @@ var initConfigTestCases = []struct {
 	{"blah", false, fmt.Errorf("Unsupported config source: 'blah'")},
 	{"consul", true, nil},
 	{"file", true, nil},
-}
-
-var getTestCases = []struct {
-	config *Config
-	err    error
-}{
-	{nil, fmt.Errorf("Config is not inited")},
-	{&Config{nil}, nil},
 }
 
 type testConfigHandler struct{}

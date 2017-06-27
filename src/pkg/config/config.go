@@ -20,17 +20,11 @@ type Config struct {
 	ConfigHandler
 }
 
-func Init() error {
-	var err error
-	config, err = initConfig(Source)
-	return err
-}
-
-func initConfig(source string) (*Config, error) {
+func Init() (*Config, error) {
 	var configHandler ConfigHandler
 	var err error
 
-	switch source {
+	switch Source {
 	case "consul":
 		configHandler, err = consulConfig.Init("auth/config/")
 		break
@@ -38,7 +32,7 @@ func initConfig(source string) (*Config, error) {
 		configHandler, err = fileConfig.Init(FilePath)
 		break
 	default:
-		err = fmt.Errorf("Unsupported config source: '%s'", source)
+		err = fmt.Errorf("Unsupported config source: '%s'", Source)
 		break
 	}
 
@@ -47,23 +41,6 @@ func initConfig(source string) (*Config, error) {
 	}
 
 	return &Config{configHandler}, nil
-}
-
-func Get() (*Config, error) {
-	var err error
-	if config == nil {
-		err = fmt.Errorf("Config is not inited")
-	}
-	return config, err
-}
-
-func Set(_config *Config) (*Config, error) {
-	var err error
-	if config != nil {
-		err = fmt.Errorf("Config already inited")
-	}
-	config = _config
-	return config, err
 }
 
 func (c *Config) GetKVPair(key string) ([]byte, error) {

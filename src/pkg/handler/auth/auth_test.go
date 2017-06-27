@@ -2,7 +2,6 @@ package auth
 
 import (
 	"encoding/json"
-	"errors"
 	"reflect"
 	"strings"
 	"testing"
@@ -11,26 +10,9 @@ import (
 	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/stretchr/testify/require"
 
-	config "../../../pkg/config"
 	proto "../../../pkg/proto/auth"
 	"golang.org/x/net/context"
 )
-
-// Config mock
-type testConfig struct{}
-
-func (c testConfig) GetKVPair(key string) ([]byte, error) {
-	switch key {
-	case "jwssecret":
-		return []byte("secret"), nil
-	case "jwtttl":
-		return []byte("180000"), nil
-	default:
-		return nil, errors.New("Test error")
-	}
-}
-
-var _, _ = config.Set(&config.Config{new(testConfig)})
 
 type testClaims struct {
 	Iat      int64  `json:"iat"`
@@ -41,18 +23,20 @@ type testClaims struct {
 
 func TestCreateJwt(t *testing.T) {
 	for _, test := range createJwtTestCases {
-		auth := new(Auth)
+		auth := &Auth{ConfigHandler: test.configHandler}
 		req := test.request
 		rsp := &proto.CreateJwtResponse{}
 		err := auth.CreateJwt(context.TODO(), req, rsp)
 
-		require.NoError(t, err, "Expected no error")
+		if !reflect.DeepEqual(test.err, err) {
+			t.Fatalf("Expected error to be %v, but got %v", test.err, err)
+		}
+
+		if test.err != nil {
+			continue
+		}
 
 		tokenParts := strings.Split(rsp.GetToken(), ".")
-
-		if l := len(tokenParts); l != 3 {
-			t.Fatalf("JWS token should contain %d segments, but found %d segments", 3, l)
-		}
 
 		if tokenParts[0] != test.header {
 			t.Fatalf("JWS header expected: %s, but found: %s", test.header, tokenParts[0])
@@ -89,7 +73,7 @@ func TestCreateJwt(t *testing.T) {
 
 func TestValidateJwt(t *testing.T) {
 	for _, test := range validateJwtTestCases {
-		auth := new(Auth)
+		auth := &Auth{ConfigHandler: test.configHandler}
 		rsp := &proto.ValidateJwtResponse{}
 		err := auth.ValidateJwt(context.TODO(), test.request, rsp)
 
