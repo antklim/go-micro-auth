@@ -10,15 +10,23 @@ import (
 	micro "github.com/micro/go-micro"
 )
 
+var (
+	Version string
+	Build   string
+)
+
 func initServiceConfig(c *cli.Context) {
 	config.Source = c.String("config")
 	config.FilePath = c.String("config_path")
 }
 
 func main() {
+	log.Printf("Service Version: %s\n", Version)
+	log.Printf("Service Build: %s\n", Build)
+
 	service := micro.NewService(
 		micro.Name("go.micro.srv.auth"),
-		micro.Version("latest"),
+		micro.Version(Version),
 		micro.Flags(
 			cli.StringFlag{
 				Name:   "config",
