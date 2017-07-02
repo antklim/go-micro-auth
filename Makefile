@@ -7,7 +7,7 @@ BUILD=`git rev-parse HEAD`
 
 LDFLAGS=-ldflags "-X main.Version=${VERSION} -X main.Build=${BUILD}"
 
-.DEFAULT_GOAL: test
+default: test
 
 build:
 	go build -i ${LDFLAGS} -o ${BINARY} ${SRC}
