@@ -27,5 +27,6 @@ get-deps:
 	go get github.com/micro/go-micro/client
 	go get github.com/micro/go-micro/server
 	go get golang.org/x/net/context
+	go get github.com/stretchr/testify/require
 
 .PHONY: build install clean test get-deps
