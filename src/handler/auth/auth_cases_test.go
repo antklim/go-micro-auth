@@ -1,7 +1,7 @@
 package auth
 
 import "fmt"
-import proto "../../../pkg/proto/auth"
+import proto "../../proto/auth"
 
 type testConfigHandler struct {
 	KVPairs map[string][]byte

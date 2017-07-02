@@ -3,9 +3,9 @@ package main
 import (
 	"log"
 
-	config "../../pkg/config"
-	handler "../../pkg/handler/auth"
-	proto "../../pkg/proto/auth"
+	config "./config"
+	handler "./handler/auth"
+	proto "./proto/auth"
 	"github.com/micro/cli"
 	micro "github.com/micro/go-micro"
 )
