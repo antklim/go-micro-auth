@@ -1,4 +1,6 @@
 # go-micro-auth
+[![Build Status](https://travis-ci.org/antklim/go-micro-auth.svg?branch=master)](https://travis-ci.org/antklim/go-micro-auth)
+
 Authentication microservice in Go lang
 
 # Service configuration
