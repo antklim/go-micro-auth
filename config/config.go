@@ -2,8 +2,8 @@ package config
 
 import "fmt"
 import (
-	consulConfig "./consul"
-	fileConfig "./file"
+	consulConfig "github.com/antklim/go-micro-auth/config/consul"
+	fileConfig "github.com/antklim/go-micro-auth/config/file"
 )
 
 var (

@@ -3,9 +3,9 @@ package main
 import (
 	"log"
 
-	config "./config"
-	handler "./handler/auth"
-	proto "./proto/auth"
+	config "github.com/antklim/go-micro-auth/config"
+	handler "github.com/antklim/go-micro-auth/handler/auth"
+	proto "github.com/antklim/go-micro-auth/proto/auth"
 	"github.com/micro/cli"
 	micro "github.com/micro/go-micro"
 )
