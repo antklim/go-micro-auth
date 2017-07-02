@@ -11,7 +11,7 @@ func TestInit(t *testing.T) {
 	for _, test := range initTestCases {
 		Source = test.source
 		// TODO: stub open file operation
-		FilePath = "../../service.cfg"
+		FilePath = "../service.cfg"
 		actualResult, err := Init()
 
 		if !reflect.DeepEqual(test.err, err) {
