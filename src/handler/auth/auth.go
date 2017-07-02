@@ -5,8 +5,8 @@ import (
 	"strconv"
 	"time"
 
-	config "../../../pkg/config"
-	proto "../../../pkg/proto/auth"
+	config "../../config"
+	proto "../../proto/auth"
 	jwt "github.com/dgrijalva/jwt-go"
 	"golang.org/x/net/context"
 )

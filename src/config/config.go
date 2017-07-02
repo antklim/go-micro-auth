@@ -2,8 +2,8 @@ package config
 
 import "fmt"
 import (
-	consulConfig "../../pkg/config/consul"
-	fileConfig "../../pkg/config/file"
+	consulConfig "./consul"
+	fileConfig "./file"
 )
 
 var (

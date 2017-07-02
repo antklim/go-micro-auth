@@ -10,7 +10,7 @@ import (
 	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/stretchr/testify/require"
 
-	proto "../../../pkg/proto/auth"
+	proto "../../proto/auth"
 	"golang.org/x/net/context"
 )
 
