@@ -1,4 +1,4 @@
-SRC=src/cmd/authsrv/main.go
+SRC=src/main.go
 BUILD_DIR=bin
 BINARY=${BUILD_DIR}/auth
 

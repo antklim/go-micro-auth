@@ -11,9 +11,7 @@ type Config struct {
 }
 
 func Init(keyPrefix string) (*Config, error) {
-	consulConfig := consulapi.DefaultConfig()
-	consul, err := consulapi.NewClient(consulConfig)
-
+	consul, err := consulapi.NewClient(consulapi.DefaultConfig())
 	if err != nil {
 		return nil, err
 	}
