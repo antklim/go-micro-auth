@@ -1,7 +1,7 @@
 package auth
 
 import "fmt"
-import proto "../../proto/auth"
+import proto "github.com/antklim/go-micro-auth/proto/auth"
 
 type testConfigHandler struct {
 	KVPairs map[string][]byte
