@@ -1,6 +1,6 @@
 SRC=main.go
 BUILD_DIR=bin
-BINARY=${BUILD_DIR}/auth
+BINARY=${BUILD_DIR}/go-micro-auth
 
 VERSION=1.0.0
 BUILD=`git rev-parse HEAD`
